@@ -9,7 +9,7 @@ exports.getAddProduct = (req, res, next) => {
 };
 exports.postAddProduct = (req, res, next) => {
   const { title, imageUrl, price, description } = req.body;
-  const product = new Product({ title, imageUrl, price, description });
+  const product = new Product({ title, imageUrl, price, description, userId: req.user._id });
   product
     .save()
     .then(() => {
@@ -61,7 +61,6 @@ exports.postEditProduct = (req, res, next) => {
     });
 };
 exports.getProducts = (req, res, next) => {
-  // Product.findAll()
   Product.find()
     .then(products => {
       res.render('admin/products', {

@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const Order = require('../models/order');
 
 exports.getProducts = (req, res, next) => {
   Product.find()
@@ -42,8 +43,10 @@ exports.getIndex = (req, res, next) => {
 };
 exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
-    .then(products => {
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then(user => {
+      const products = user.cart.items;
       res.render('shop/cart', {
         path: '/cart',
         pageTitle: 'Your cart',
@@ -68,7 +71,7 @@ exports.postCart = (req, res, next) => {
 exports.postCartDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
   req.user
-    .deleteCartItem(productId)
+    .removeFromCart(productId)
     .then(() => {
       console.log('CART ITEM DELETED');
       res.redirect('/cart');
@@ -78,25 +81,47 @@ exports.postCartDeleteProduct = (req, res, next) => {
     });
 };
 exports.getOrders = (req, res, next) => {
+
+  Order.find({ 'user.userId': req.user._id }).then(orders => {
+    res.render('shop/orders', {
+      path: '/orders',
+      pageTitle: 'Your orders',
+      orders,
+    });
+  });
+};
+exports.postOrder = (req, res, next) => {
   req.user
-    .getOrders()
-    .then(orders => {
-      res.render('shop/orders', {
-        path: '/orders',
-        pageTitle: 'Your orders',
-        orders,
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then(user => {
+      const products = user.cart.items.map(i => {
+        // productId is actualy whole product data because of populate
+        // _doc gets only data
+        return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
+      const order = new Order({
+        user: {
+          name: req.user.name,
+          userId: req.user._id, // or req.user, lib automatically picks _id
+        },
+        products,
+      });
+
+      return order.save();
+    })
+    .then(() => {
+      return req.user.clearCart();
+    })
+    .then(() => {
+      res.redirect('/orders');
     })
     .catch(err => {
       console.log(err);
     });
-};
-exports.postOrder = (req, res, next) => {
   req.user
     .addOrder()
-    .then(() => {
-      res.redirect('/orders');
-    })
+
     .catch(err => {
       console.log(err);
     });
