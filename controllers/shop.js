@@ -8,6 +8,7 @@ exports.getProducts = (req, res, next) => {
         products,
         pageTitle: 'All products',
         path: '/products',
+        isLoggedIn: req.isLoggedIn,
       });
     })
     .catch(err => {
@@ -22,6 +23,7 @@ exports.getProduct = (req, res, next) => {
         pageTitle: product.title,
         product,
         path: '/products',
+        isLoggedIn: req.isLoggedIn,
       });
     })
     .catch(err => {
@@ -35,6 +37,7 @@ exports.getIndex = (req, res, next) => {
         products,
         pageTitle: 'Shop',
         path: '/',
+        isLoggedIn: req.isLoggedIn,
       });
     })
     .catch(err => {
@@ -51,6 +54,7 @@ exports.getCart = (req, res, next) => {
         path: '/cart',
         pageTitle: 'Your cart',
         products,
+        isLoggedIn: req.isLoggedIn,
       });
     })
     .catch(err => {
@@ -81,12 +85,12 @@ exports.postCartDeleteProduct = (req, res, next) => {
     });
 };
 exports.getOrders = (req, res, next) => {
-
   Order.find({ 'user.userId': req.user._id }).then(orders => {
     res.render('shop/orders', {
       path: '/orders',
       pageTitle: 'Your orders',
       orders,
+      isLoggedIn: req.isLoggedIn,
     });
   });
 };
@@ -96,9 +100,10 @@ exports.postOrder = (req, res, next) => {
     .execPopulate()
     .then(user => {
       const products = user.cart.items.map(i => {
-        // productId is actualy whole product data because of populate
+        // productId is actually whole product data because of populate
         // _doc gets only data
-        return { quantity: i.quantity, product: { ...i.productId._doc } };
+        // return { quantity: i.quantity, product: i.productId._doc };
+        return { quantity: i.quantity, product: {...i.productId._doc} };
       });
       const order = new Order({
         user: {
@@ -119,10 +124,10 @@ exports.postOrder = (req, res, next) => {
     .catch(err => {
       console.log(err);
     });
-  req.user
-    .addOrder()
 
-    .catch(err => {
-      console.log(err);
-    });
+  // req.user
+  //   .addOrder()
+  //   .catch(err => {
+  //     console.log(err);
+  //   });
 };

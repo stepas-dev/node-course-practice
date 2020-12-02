@@ -5,6 +5,7 @@ exports.getAddProduct = (req, res, next) => {
     pageTitle: 'Add product',
     path: '/admin/add-product',
     edit: false,
+    isLoggedIn: req.isLoggedIn,
   });
 };
 exports.postAddProduct = (req, res, next) => {
@@ -36,6 +37,7 @@ exports.getEditProduct = (req, res, next) => {
         path: '/admin/edit-product',
         edit,
         product,
+        isLoggedIn: req.isLoggedIn,
       });
     })
     .catch(err => {
@@ -67,6 +69,7 @@ exports.getProducts = (req, res, next) => {
         products,
         pageTitle: 'Shop',
         path: '/admin/products',
+        isLoggedIn: req.isLoggedIn,
       });
     })
     .catch(err => {
