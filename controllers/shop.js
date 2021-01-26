@@ -8,7 +8,7 @@ exports.getProducts = (req, res, next) => {
         products,
         pageTitle: 'All products',
         path: '/products',
-        isLoggedIn: req.isLoggedIn,
+        isLoggedIn: req.session.isLoggedIn,
       });
     })
     .catch(err => {
@@ -23,7 +23,7 @@ exports.getProduct = (req, res, next) => {
         pageTitle: product.title,
         product,
         path: '/products',
-        isLoggedIn: req.isLoggedIn,
+        isLoggedIn: req.session.isLoggedIn,
       });
     })
     .catch(err => {
@@ -37,7 +37,7 @@ exports.getIndex = (req, res, next) => {
         products,
         pageTitle: 'Shop',
         path: '/',
-        isLoggedIn: req.isLoggedIn,
+        isLoggedIn: req.session.isLoggedIn,
       });
     })
     .catch(err => {
@@ -54,7 +54,7 @@ exports.getCart = (req, res, next) => {
         path: '/cart',
         pageTitle: 'Your cart',
         products,
-        isLoggedIn: req.isLoggedIn,
+        isLoggedIn: req.session.isLoggedIn,
       });
     })
     .catch(err => {
@@ -90,7 +90,7 @@ exports.getOrders = (req, res, next) => {
       path: '/orders',
       pageTitle: 'Your orders',
       orders,
-      isLoggedIn: req.isLoggedIn,
+      isLoggedIn: req.session.isLoggedIn,
     });
   });
 };
@@ -103,12 +103,12 @@ exports.postOrder = (req, res, next) => {
         // productId is actually whole product data because of populate
         // _doc gets only data
         // return { quantity: i.quantity, product: i.productId._doc };
-        return { quantity: i.quantity, product: {...i.productId._doc} };
+        return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
       const order = new Order({
         user: {
           name: req.user.name,
-          userId: req.user._id, // or req.user, lib automatically picks _id
+          userId: req.user._id, // or  req.user, lib automatically picks _id
         },
         products,
       });
@@ -125,7 +125,7 @@ exports.postOrder = (req, res, next) => {
       console.log(err);
     });
 
-  // req.user
+  //  req.user
   //   .addOrder()
   //   .catch(err => {
   //     console.log(err);
