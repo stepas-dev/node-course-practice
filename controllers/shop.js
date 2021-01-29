@@ -8,7 +8,6 @@ exports.getProducts = (req, res, next) => {
         products,
         pageTitle: 'All products',
         path: '/products',
-        isLoggedIn: req.session.isLoggedIn,
       });
     })
     .catch(err => {
@@ -23,7 +22,6 @@ exports.getProduct = (req, res, next) => {
         pageTitle: product.title,
         product,
         path: '/products',
-        isLoggedIn: req.session.isLoggedIn,
       });
     })
     .catch(err => {
@@ -37,7 +35,6 @@ exports.getIndex = (req, res, next) => {
         products,
         pageTitle: 'Shop',
         path: '/',
-        isLoggedIn: req.session.isLoggedIn,
       });
     })
     .catch(err => {
@@ -54,7 +51,6 @@ exports.getCart = (req, res, next) => {
         path: '/cart',
         pageTitle: 'Your cart',
         products,
-        isLoggedIn: req.session.isLoggedIn,
       });
     })
     .catch(err => {
@@ -90,7 +86,6 @@ exports.getOrders = (req, res, next) => {
       path: '/orders',
       pageTitle: 'Your orders',
       orders,
-      isLoggedIn: req.session.isLoggedIn,
     });
   });
 };
@@ -107,7 +102,7 @@ exports.postOrder = (req, res, next) => {
       });
       const order = new Order({
         user: {
-          name: req.user.name,
+          email: req.user.email,
           userId: req.user._id, // or  req.user, lib automatically picks _id
         },
         products,
@@ -124,10 +119,4 @@ exports.postOrder = (req, res, next) => {
     .catch(err => {
       console.log(err);
     });
-
-  //  req.user
-  //   .addOrder()
-  //   .catch(err => {
-  //     console.log(err);
-  //   });
 };
